@@ -3,34 +3,41 @@ import 'package:todoapp/constant/colors.dart';
 import 'package:todoapp/model/todo.dart';
 
 class todoItem extends StatelessWidget {
-  final toDo todo;
 
-  todoItem({required this.todo});
+  final Function(toDo) remove;
+  final toDo TodoObject;
+
+  final Function(toDo) onChangeChecboxValue;
+
+
+  todoItem({required this.TodoObject,required this.onChangeChecboxValue,
+  required this.remove
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(bottom: 18),
         child: ListTile(
-          contentPadding: EdgeInsets.symmetric(horizontal: 20,vertical: 5),
-          onTap: () {},
+
+          contentPadding: EdgeInsets.symmetric(horizontal: 5,vertical: 5),
+
           tileColor: Colors.white,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          leading: Icon(
-            todo.isDone?Icons.check_box:Icons.check_box_outline_blank,
-            color: tdBlue,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          leading: Checkbox(
+            value: TodoObject.isDone,
+            onChanged: (value) => onChangeChecboxValue(TodoObject),
           ),
           title: Text(
-            todo.todoText!,
+            TodoObject.todoText!,
             style: TextStyle(
                 color: tdBlack,
                 fontSize: 16,
-                decoration:todo.isDone? TextDecoration.lineThrough:null),
+                decoration:TodoObject.isDone? TextDecoration.lineThrough:null),
           ),
           trailing: Container(
 
-            margin: EdgeInsets.symmetric(vertical: 12),
+            margin: EdgeInsets.symmetric(vertical: 12,horizontal: 10),
             height: 35,
             width: 35,
             decoration: BoxDecoration(
@@ -41,7 +48,9 @@ class todoItem extends StatelessWidget {
               iconSize: 18,
               color: Colors.white,
               icon: Icon(Icons.delete),
-              onPressed: () {  },
+              onPressed: () {
+                remove(TodoObject);
+              },
             ),
           ),
         ),

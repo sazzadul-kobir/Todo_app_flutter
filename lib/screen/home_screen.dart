@@ -3,10 +3,72 @@ import 'package:todoapp/constant/colors.dart';
 import 'package:todoapp/model/todo.dart';
 import 'package:todoapp/widget/todo_item.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+
+  TextEditingController botomtextcontroller=TextEditingController();
+  late TextEditingController _searchtextEditingController;
+
+
+  @override
+  void initState() {
+    super.initState();
+    _searchtextEditingController = TextEditingController();
+  }
+
+
+
+
+
+  List<toDo> todos=[
+    toDo(todoText: "walking to the moon",isDone: true),
+    toDo(todoText: "vandy baja khaite moja",isDone: false)
+  ];
+
+
+
+
+
+  List<toDo> _filter(String query){
+    return todos.where((todo) => todo.todoText!.toLowerCase()
+          .contains(query.toLowerCase())).toList();
+
+  }
+
+  void _addtodo(){
+    
+    if(botomtextcontroller.text.isNotEmpty){
+      setState(() {
+        todos.add(toDo(todoText: botomtextcontroller.text,isDone: false));
+        botomtextcontroller.clear();
+        FocusScope.of(context).unfocus();
+      });
+    }
+  }
+
+  void _toggleCompleted(toDo todoObj) {
+    setState(() {
+      todoObj.isDone= !todoObj.isDone;
+    });}
+
+  void _removeTodo(toDo tod){
+    setState(() {
+      todos.remove(tod);
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchtextEditingController.dispose();
+    botomtextcontroller.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
-    final List todolist = toDo.todoList();
 
     return Scaffold(
       backgroundColor: tdBgColor,
@@ -37,7 +99,9 @@ class Home extends StatelessWidget {
           child: Column(
             children: [
               TextField(
+              controller: _searchtextEditingController,
                 decoration: InputDecoration(
+
                     filled: true,
                     fillColor: Colors.white,
                     prefixIcon: Icon(
@@ -48,24 +112,31 @@ class Home extends StatelessWidget {
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(25),
                         borderSide: BorderSide.none)),
+                onChanged: (value){
+                  setState(() {
+
+                  });
+                },
               ),
               Expanded(
-                child: ListView(
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(
-                        top: 50,
-                        bottom: 20,
-                      ),
-                      child: Text(
-                        "All Todos",
-                        style: TextStyle(
-                            fontSize: 30, fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                    for (toDo tdo in todolist) todoItem(todo: tdo)
-                  ],
-                ),
+                child: Container(
+                  margin: EdgeInsets.only(top: 20),
+                  child: ListView.builder(
+                    itemCount: _filter(_searchtextEditingController.text).length,
+
+                      itemBuilder: (context,index){
+                        final Todo=_filter(_searchtextEditingController.text)[index];
+                        return todoItem(
+                            TodoObject: Todo,
+
+                          onChangeChecboxValue: _toggleCompleted,
+                          remove: _removeTodo,
+                        );
+                      },
+
+
+                  ),
+                )
               )
             ],
           ),
@@ -96,7 +167,7 @@ class Home extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10)
                   ),
                   child: TextField(
-
+                    controller: botomtextcontroller,
                     decoration: InputDecoration(
 
                       hintText: "add a new todo item",
@@ -108,7 +179,9 @@ class Home extends StatelessWidget {
               Container(
                 margin: EdgeInsets.only(bottom: 22,right: 20),
                 child: ElevatedButton(
-                    onPressed: (){},
+                    onPressed: (){
+                      _addtodo();
+                    },
                   child: Text("+",style: TextStyle(fontSize: 40,color: Colors.white),),
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5),),
@@ -124,4 +197,7 @@ class Home extends StatelessWidget {
       ]),
     );
   }
+
+
+
 }
